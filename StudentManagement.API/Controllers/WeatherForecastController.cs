@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using StudentManagement.API.Exceptions;
 
 namespace StudentManagement.API.Controllers
 {
@@ -21,6 +22,12 @@ namespace StudentManagement.API.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
+            string firstName = null;
+            if (string.IsNullOrEmpty(firstName))
+            {
+                throw new ValidationException("Validation failed for the request");
+            }
+            string fullName = firstName.ToString();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
