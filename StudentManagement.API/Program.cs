@@ -1,3 +1,4 @@
+using StudentManagement.API.Filters;
 using StudentManagement.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<FactoryMiddleware>();
 
 builder.Services.AddControllers();
+//builder.Services.AddTransient<FactoryMiddleware>();
+
+builder.Services.AddControllers(config =>
+{
+    config.Filters.Add(new GlobalExceptionFilter());
+});
+builder.Services.AddSwaggerGen();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -27,6 +35,8 @@ app.Use(async (context, next) =>
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
@@ -35,10 +45,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseMiddleware<ConventionMiddleware>();
-app.UseMiddleware<ConventionMiddleware1>();
-app.UseMiddleware<ConventionMiddleware2>();
-app.UseMiddleware<FactoryMiddleware>();
+//app.UseMiddleware<ConventionMiddleware>();
+//app.UseMiddleware<ConventionMiddleware1>();
+//app.UseMiddleware<ConventionMiddleware2>();
+//app.UseMiddleware<FactoryMiddleware>();
 
 
 //app.Map("/map1", MapMethod1);
