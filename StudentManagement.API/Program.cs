@@ -1,9 +1,23 @@
+using StudentManagement.API.BackgroundTask;
 using StudentManagement.API.Filters;
 using StudentManagement.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
+//builder.Host.ConfigureServices(services =>
+//{
+//    services.AddHostedService<TimedHostedService>();
+//});
+
+builder.WebHost.ConfigureKestrel(option =>
+{
+    option.Limits.KeepAliveTimeout = TimeSpan.FromSeconds(120);
+    option.Limits.MaxConcurrentConnections = 10;
+    option.Limits.MaxConcurrentUpgradedConnections = 10;
+});
 
 // Add services to the container.
+builder.Services.AddHostedService<TimedHostedService>();
+builder.Services.AddHostedService<TimedBackgroundService>();
 
 builder.Services.AddTransient<FactoryMiddleware>();
 
@@ -34,12 +48,12 @@ app.Use(async (context, next) =>
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    //app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
