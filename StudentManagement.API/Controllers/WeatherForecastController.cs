@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using StudentManagement.API.Exceptions;
+using StudentManagement.API.Filters;
 
 namespace StudentManagement.API.Controllers
 {
+    [CustomRoleAuthorize("Manager")]
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController(ILogger<WeatherForecastController> _logger) : ControllerBase
