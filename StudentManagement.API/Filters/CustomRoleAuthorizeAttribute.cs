@@ -10,7 +10,6 @@ namespace StudentManagement.API.Filters
         {
             _role = role;
         }
-
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var user = context.HttpContext.User;

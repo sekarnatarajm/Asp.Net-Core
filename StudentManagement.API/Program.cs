@@ -3,6 +3,7 @@ using StudentManagement.API.BackgroundTask;
 using StudentManagement.API.Exceptions;
 using StudentManagement.API.Filters;
 using StudentManagement.API.Middlewares;
+using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,9 @@ builder.WebHost.ConfigureKestrel(option =>
     option.Limits.MaxConcurrentConnections = 10;
     option.Limits.MaxConcurrentUpgradedConnections = 10;
 });
+
+//Add Memory Cache
+builder.Services.AddMemoryCache();
 
 //Add Background Services
 builder.Services.AddHostedService<TimedHostedService>();
@@ -23,6 +27,9 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddTransient<FactoryMiddleware>();
 
+//Cache
+builder.Services.AddScoped<CustomCacheResourceFilter>();
+
 builder.Services.AddControllers();
 //builder.Services.AddTransient<FactoryMiddleware>();
 
@@ -32,7 +39,10 @@ builder.Services.AddControllers(config =>
     config.Filters.Add(new GlobalExceptionFilter());
     config.Filters.Add(new CustomRoleAuthorizeAttribute(""));
 });
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+});
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -98,6 +108,21 @@ app.MapControllers();
 
 app.Map("/map1", MapMethod1);
 //app.Map("/map2", MapMethod2);
+
+app.MapPost("/students", async (string student = "") =>
+{
+    return Results.Ok(student);
+})
+.AddEndpointFilter<EndPointValidationFilter>();
+//.AddEndpointFilter(async (context, next) =>
+//{
+//    var name = context.GetArgument<string>(0);
+//    if (string.IsNullOrWhiteSpace(name))
+//    {
+//        return Results.BadRequest("Name is required.");
+//    }
+//    return await next(context);
+//});
 
 app.Run();
 

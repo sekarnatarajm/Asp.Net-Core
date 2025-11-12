@@ -10,12 +10,12 @@
             }
 
             // Add a custom header to the request (not common, but possible)
-            context.Request.Headers["ApiKey"] = "895664623";
+            context.Request.Headers["ApiKey"] = "8956-6462-3896";
 
             // Add a custom header to the response
             context.Response.OnStarting(() =>
             {
-                context.Response.Headers["ApiKeyOne"] = "MyValue";
+                context.Response.Headers["ApiKey"] = "8956-6462-3896";
                 return Task.CompletedTask;
             });
 

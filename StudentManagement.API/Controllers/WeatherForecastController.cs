@@ -1,13 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using StudentManagement.API.Exceptions;
 using StudentManagement.API.Filters;
 
 namespace StudentManagement.API.Controllers
 {
+    [ApiKeyValidationFilter]
+    [ServiceFilter(typeof(CustomCacheResourceFilter))]
     [CustomRoleAuthorize("Manager")]
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController(ILogger<WeatherForecastController> _logger) : ControllerBase
+    public class WeatherForecastController(ILogger<WeatherForecastController> _logger, IMemoryCache _cache) : ControllerBase
     {
         private static readonly string[] Summaries = new[]
         {
@@ -39,6 +42,11 @@ namespace StudentManagement.API.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+        [HttpGet("User/GetUserById")]
+        public IActionResult GetUserDetailById(int id)
+        {
+            return Ok(new { Name = "Laptop", Price = 1200 });
         }
     }
 }
