@@ -54,8 +54,8 @@ builder.Services.AddOpenApi();
 //Health Checks
 builder.Services.AddHealthChecks()
     .AddCheck<SqlCustomHealthCheck>("Custom Sql Server", HealthStatus.Unhealthy)
-    .AddSqlServer("Server=localhost,1433;Database=CustomerSettings;User Id=sa;Password=Swiftdezire@123;TrustServerCertificate=True;")
-    .AddRedis("127.0.0.1:6379");
+    .AddSqlServer("")
+    .AddRedis("");
 
 builder.Services.AddHealthChecks()
     .AddCheck<SqlCustomHealthCheck>("Custom Sql Server health check", HealthStatus.Unhealthy)
