@@ -1,7 +1,11 @@
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using StudentManagement.API.BackgroundTask;
 using StudentManagement.API.Exceptions;
 using StudentManagement.API.Filters;
+using StudentManagement.API.HealthCheck;
 using StudentManagement.API.Middlewares;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -18,8 +22,8 @@ builder.WebHost.ConfigureKestrel(option =>
 builder.Services.AddMemoryCache();
 
 //Add Background Services
-builder.Services.AddHostedService<TimedHostedService>();
-builder.Services.AddHostedService<TimedBackgroundService>();
+//builder.Services.AddHostedService<TimedHostedService>();
+//builder.Services.AddHostedService<TimedBackgroundService>();
 
 //Add Exception Handler Services
 builder.Services.AddExceptionHandler<GlobalExceptionHandelr>();
@@ -46,6 +50,19 @@ builder.Services.AddSwaggerGen(c =>
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+//Health Checks
+builder.Services.AddHealthChecks()
+    .AddCheck<SqlCustomHealthCheck>("Custom Sql Server", HealthStatus.Unhealthy)
+    .AddSqlServer("Server=localhost,1433;Database=CustomerSettings;User Id=sa;Password=Swiftdezire@123;TrustServerCertificate=True;")
+    .AddRedis("127.0.0.1:6379");
+
+builder.Services.AddHealthChecks()
+    .AddCheck<SqlCustomHealthCheck>("Custom Sql Server health check", HealthStatus.Unhealthy)
+    .AddSqlServer("connction string")
+    .AddRedis("connction string");
+//.AddSqlServer("Server=localhost,1433;Database=CustomerSettings;User Id=sa;Password=Swiftdezire@123", healthQuery : "Select 1", name: "SQL Server", 
+//failureStatus: HealthStatus.Unhealthy, tags: new[] { "Feedback", "Database" });
 
 var app = builder.Build();
 
@@ -104,6 +121,11 @@ app.MapControllers();
 //app.UseMiddleware<ConventionMiddleware1>();
 //app.UseMiddleware<ConventionMiddleware2>();
 //app.UseMiddleware<FactoryMiddleware>();
+
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 
 app.Map("/map1", MapMethod1);
